@@ -12,14 +12,14 @@ public class LogTail {
     private String regex; // = "^(?:[^\\s]+\\s){3}\\[([^\\]]+)\\].*$";
     private String targetDate;
 
-    private LogTail(String[] args) {
-        filename = args[0];
-        dateFormat = new SimpleDateFormat(args[1], Locale.ENGLISH);
-        targetDate = args[3];
-        regex = args[2];
+    public LogTail(String filename, DateFormat dateFormat, String targetDate, String logLineRegex) {
+        this.filename = filename;
+        this.dateFormat = dateFormat;
+        this.targetDate = targetDate;
+        this.regex = logLineRegex;
     }
 
-    private void run() throws Exception {
+    public void tail(OutputStream out) throws Exception {
         File fileToRead = new File(filename);
 
         if (fileToRead.exists()) {
@@ -56,7 +56,7 @@ public class LogTail {
                 byte[] buffer = new byte[4096];
                 file.seek(left);
                 for (int i = 0; i >= 0; i = file.read(buffer)) {
-                    System.out.print(new String(buffer, 0, i, StandardCharsets.US_ASCII));
+                    out.write(buffer, 0, i);
                 }
             }
         }
@@ -103,7 +103,11 @@ public class LogTail {
     }
 
     public static void main(String[] args) throws Exception {
-        LogTail assigment = new LogTail(args);
-        assigment.run();
+        String filename = args[0];
+        DateFormat dateFormat = new SimpleDateFormat(args[1], Locale.ENGLISH);
+        String targetDate = args[3];
+        String logLineRegex = args[2];
+        LogTail assigment = new LogTail(filename, dateFormat, targetDate, logLineRegex);
+        assigment.tail(System.out);
     }
 }
