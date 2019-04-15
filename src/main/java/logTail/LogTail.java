@@ -63,18 +63,6 @@ public class LogTail {
 
     }
 
-    private long getLineEnd(RandomAccessFile file, long middle, long right) throws IOException {
-        long pos = middle;
-        file.seek(pos);
-        while (pos < right) {
-            if (file.readByte() == '\n') {
-                return pos;
-            }
-            pos++;
-        }
-        return right;
-    }
-
     private long getLineStart(RandomAccessFile file, long middle, long left) throws IOException {
         long pos = middle;
         while (pos >= left) {
@@ -87,9 +75,23 @@ public class LogTail {
         return left;
     }
 
+    private long getLineEnd(RandomAccessFile file, long middle, long right) throws IOException {
+        long pos = middle;
+        file.seek(pos);
+        while (pos < right) {
+            if (file.readByte() == '\n') {
+                return pos;
+            }
+            pos++;
+        }
+        return right;
+    }
+
+
     private Date strDateParser(String str) throws Exception {
         String dateFromStr;
         Pattern pattern = Pattern.compile(regex);
+
         try {
             Matcher matcher = pattern.matcher(str);
             dateFromStr = matcher.group();
@@ -98,6 +100,12 @@ public class LogTail {
             System.out.println("String does not match pattern.");
             throw e;
         }
+
+//        Matcher matcher = pattern.matcher(str);
+//        if (matcher.matches()) {
+//            dateFromStr = matcher.group();
+//            return dateFormat.parse(dateFromStr);
+//        }
 
         return dateFormat.parse(dateFromStr);
     }
