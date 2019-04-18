@@ -2,6 +2,7 @@ package logTail;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -72,5 +73,25 @@ class LogTailTest {
 
 
         assertEquals(315, exp);
+    }
+
+    @Test
+    void testWithInputStream() throws Exception {
+        String logContent =
+                "178.115.130.130 - - [26/Dec/2015:18:50:13 +0100] \"GET /templates/_system/css/general.css HTTP/1.1\" 404 239 \"http://www.almhuette-raith.at/index.php?option=com_content&view=article&id=49&Itemid=55\" \"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36\" \"-\"\n" +
+                        "178.115.130.130 - - [26/Dec/2015:18:50:13 +0100] \"GET /images/stories/raith/wohnung_1_web.jpg HTTP/1.1\" 200 80510 \"http://www.almhuette-raith.at/index.php?option=com_content&view=article&id=49&Itemid=55\" \"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36\" \"-\"\n" +
+                        "178.115.130.130 - - [26/Dec/2015:18:50:39 +0100] \"GET /index.php?option=com_phocagallery&view=category&id=1&Itemid=53 HTTP/1.1\" 200 32583 \"http://www.almhuette-raith.at/index.php?option=com_content&view=article&id=49&Itemid=55\" \"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36\" \"-\"\n" +
+                        "178.115.130.130 - - [26/Dec/2015:18:50:39 +0100] \"GET /components/com_phocagallery/assets/phocagallery.css HTTP/1.1\" 200 15063 \"http://www.almhuette-raith.at/index.php?option=com_phocagallery&view=category&id=1&Itemid=53\" \"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36\" \"-\"\n";
+        InputStream is = new ByteArrayInputStream(logContent.getBytes(StandardCharsets.US_ASCII));
+        LogTail logTail = new LogTail(is,
+                new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH),
+                "25/Dec/2018:14:18:20 +0100",
+                "^(?:[^\\s]+\\s){3}\\[([^\\]]+)\\].*$");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
+        logTail.tail(out);
+
+        assertEquals(0, out.size());
+        assertEquals("", out.toString("ASCII"));
     }
 }
